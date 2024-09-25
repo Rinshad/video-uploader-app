@@ -1,0 +1,65 @@
+name: Create Kind Cluster with Terraform
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  create-kind-cluster:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Setup Kind
+      uses: engineerd/setup-kind@v0.5.0
+      with:
+        version: "v0.17.0"
+
+    - name: Create Kind config file
+      run: |
+        cat << EOF > kind-config.yaml
+        kind: Cluster
+        apiVersion: kind.x-k8s.io/v1alpha4
+        nodes:
+        - role: control-plane
+        - role: worker
+        - role: worker
+        EOF
+
+    - name: Initialize Terraform
+      run: terraform init
+
+    - name: Create Kind cluster with Terraform
+      run: |
+        cat << EOF > main.tf
+        resource "kind_cluster" "default" {
+          name = "test-cluster"
+          kind_config {
+            kind = "Cluster"
+            api_version = "kind.x-k8s.io/v1alpha4"
+            node {
+              role = "control-plane"
+            }
+            node {
+              role = "worker"
+            }
+            node {
+              role = "worker"
+            }
+          }
+        }
+        EOF
+        terraform apply -auto-approve
+
+    - name: Verify cluster
+      run: |
+        kubectl get nodes
+        kubectl cluster-info
