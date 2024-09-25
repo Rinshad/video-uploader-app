@@ -1,0 +1,12 @@
+FROM ruby:3.1.3 AS rails-env
+
+WORKDIR /app
+COPY api .
+
+# Install bundler version specified in Gemfile.lock
+RUN gem install bundler -v 2.4.6
+
+# Install dependencies
+RUN bundle install
+
+ENTRYPOINT ["bundle", "exec"]

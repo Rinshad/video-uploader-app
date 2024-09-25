@@ -1,0 +1,11 @@
+require:
+  - rubocop-rails
+  - rubocop-rspec
+
+AllCops:
+  Exclude:
+    - 'db/migrate/**'
+    - 'bin/**'
+
+Style/Documentation:
+  Enabled: false
