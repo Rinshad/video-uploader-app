@@ -2,10 +2,8 @@ name: Create Kind Cluster with Terraform
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - master
 
 jobs:
   create-kind-cluster:
@@ -34,12 +32,18 @@ jobs:
         - role: worker
         EOF
 
-    - name: Initialize Terraform
-      run: terraform init
-
-    - name: Create Kind cluster with Terraform
+    - name: Create Terraform configuration
       run: |
         cat << EOF > main.tf
+        terraform {
+          required_providers {
+            kind = {
+              source  = "tehcyx/kind"
+              version = "0.2.1"
+            }
+          }
+        }
+
         resource "kind_cluster" "default" {
           name = "test-cluster"
           kind_config {
@@ -57,7 +61,12 @@ jobs:
           }
         }
         EOF
-        terraform apply -auto-approve
+
+    - name: Initialize Terraform
+      run: terraform init -upgrade
+
+    - name: Create Kind cluster with Terraform
+      run: terraform apply -auto-approve
 
     - name: Verify cluster
       run: |
