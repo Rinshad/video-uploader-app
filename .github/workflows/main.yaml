@@ -68,8 +68,14 @@ jobs:
                 resources:
                   requests:
                     storage: 1Gi
+                volumeMode: Filesystem
+                hostPath:
+                  path: /data/nginx
+                  type: DirectoryOrCreate
           EOF
-    
+      - name: Sleep for 2 minutes
+        run: sleep 120
+        
       - name: Verify Nginx StatefulSet
         run: |
             kubectl get statefulsets
