@@ -12,6 +12,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       
+      - name: SonarQube Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+      
       - name: Install Trivy
         run: |
           sudo apt-get update
@@ -45,7 +50,7 @@ jobs:
           trivy image --format json --output trivy-api-report.json ${{ secrets.DOCKERHUB_USERNAME }}/api:latest
 
       - name: Upload API scan result as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-api-report
           path: trivy-api-report.json
@@ -64,7 +69,7 @@ jobs:
           trivy image --format json --output trivy-sidekiq-report.json ${{ secrets.DOCKERHUB_USERNAME }}/sidekiq:latest
 
       - name: Upload Sidekiq scan result as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-sidekiq-report
           path: trivy-sidekiq-report.json
@@ -83,7 +88,7 @@ jobs:
           trivy image --format json --output trivy-spa-report.json ${{ secrets.DOCKERHUB_USERNAME }}/spa:latest
 
       - name: Upload SPA scan result as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-spa-report
           path: trivy-spa-report.json
@@ -102,15 +107,11 @@ jobs:
           trivy image --format json --output trivy-nginx-report.json ${{ secrets.DOCKERHUB_USERNAME }}/nginx:latest
 
       - name: Upload Nginx scan result as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-nginx-report
           path: trivy-nginx-report.json
 
-      - name: SonarQube Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
 
   create-kind-cluster:
     needs: build-and-push
@@ -139,3 +140,45 @@ jobs:
         run: |
           kubectl get nodes
           kubectl cluster-info
+          name: Deploy Nginx StatefulSet
+          run: |
+            cat <<EOF | kubectl apply -f -
+            apiVersion: apps/v1
+            kind: StatefulSet
+            metadata:
+              name: nginx
+            spec:
+              serviceName: "nginx"
+              replicas: 1
+              selector:
+                matchLabels:
+                  app: nginx
+              template:
+                metadata:
+                  labels:
+                    app: nginx
+                spec:
+                  containers:
+                  - name: nginx
+                    image: nginx:1.21.6
+                    ports:
+                    - containerPort: 80
+                      name: web
+                    volumeMounts:
+                    - name: nginx-storage
+                      mountPath: /usr/share/nginx/html
+              volumeClaimTemplates:
+              - metadata:
+                  name: nginx-storage
+                spec:
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 1Gi
+            EOF
+    
+        - name: Verify Nginx StatefulSet
+          run: |
+            kubectl get statefulsets
+            kubectl get pods
+            kubectl describe statefulset nginx

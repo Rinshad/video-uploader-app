@@ -16,6 +16,7 @@ services:
     tty: true
     stdin_open: true
     build:
+      context: .
       dockerfile: Dockerfile.rails
     platform: "linux/${CPU_ARCH-amd64}"
     volumes:
@@ -28,12 +29,14 @@ services:
       DB_HOST: db
       DB_USER: postgres
       DB_PASS: password
+      SECRET_KEY_BASE: 1f5f2b818aa2fd4cf2e9e356f1a235edd4a3ac3fcbbf8e61d02f6213f42daddf100e0ead7299e2ab0b72140aba228ae44fcfb26a9125c6c7dddd657afed2d5e9
     depends_on:
       - db
       - redis
 
   sidekiq:
     build:
+      context: .
       dockerfile: Dockerfile.rails
     volumes:
       - ./api:/app
@@ -44,12 +47,14 @@ services:
       DB_HOST: db
       DB_USER: postgres
       DB_PASS: password
+      SECRET_KEY_BASE: 1f5f2b818aa2fd4cf2e9e356f1a235edd4a3ac3fcbbf8e61d02f6213f42daddf100e0ead7299e2ab0b72140aba228ae44fcfb26a9125c6c7dddd657afed2d5e9
     depends_on:
       - db
       - redis
 
   spa:
     build:
+      context: .
       dockerfile: Dockerfile.react
     platform: "linux/${CPU_ARCH-amd64}"
     volumes:
