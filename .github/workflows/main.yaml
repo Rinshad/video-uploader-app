@@ -140,6 +140,7 @@ jobs:
         run: |
           kubectl get nodes
           kubectl cluster-info
+
       - name: Deploy Nginx StatefulSet
         run: |
           cat <<EOF | kubectl apply -f -
@@ -177,8 +178,8 @@ jobs:
                     storage: 1Gi
           EOF
     
-        - name: Verify Nginx StatefulSet
-          run: |
+      - name: Verify Nginx StatefulSet
+        run: |
             kubectl get statefulsets
             kubectl get pods
             kubectl describe statefulset nginx
