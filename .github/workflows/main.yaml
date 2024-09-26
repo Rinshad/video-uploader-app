@@ -32,6 +32,17 @@ jobs:
             --tag ${{ secrets.DOCKERHUB_USERNAME }}/api:latest \
             --push .
 
+      - name: Scan API image with Trivy
+        run: |
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/api:latest
+          trivy image --format json --output trivy-api-report.json ${{ secrets.DOCKERHUB_USERNAME }}/api:latest
+
+      - name: Upload API scan result as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-api-report
+          path: trivy-api-report.json
+
       - name: Build and push Sidekiq image
         run: |
           docker buildx build \
@@ -39,6 +50,17 @@ jobs:
             --file Dockerfile.rails \
             --tag ${{ secrets.DOCKERHUB_USERNAME }}/sidekiq:latest \
             --push .
+
+      - name: Scan Sidekiq image with Trivy
+        run: |
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/sidekiq:latest
+          trivy image --format json --output trivy-sidekiq-report.json ${{ secrets.DOCKERHUB_USERNAME }}/sidekiq:latest
+
+      - name: Upload Sidekiq scan result as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-sidekiq-report
+          path: trivy-sidekiq-report.json
 
       - name: Build and push SPA image
         run: |
@@ -48,6 +70,17 @@ jobs:
             --tag ${{ secrets.DOCKERHUB_USERNAME }}/spa:latest \
             --push .
 
+      - name: Scan SPA image with Trivy
+        run: |
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/spa:latest
+          trivy image --format json --output trivy-spa-report.json ${{ secrets.DOCKERHUB_USERNAME }}/spa:latest
+
+      - name: Upload SPA scan result as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-spa-report
+          path: trivy-spa-report.json
+
       - name: Build and push Nginx image
         run: |
           docker buildx build \
@@ -56,30 +89,46 @@ jobs:
             --tag ${{ secrets.DOCKERHUB_USERNAME }}/nginx:latest \
             --push .
 
+      - name: Scan Nginx image with Trivy
+        run: |
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/nginx:latest
+          trivy image --format json --output trivy-nginx-report.json ${{ secrets.DOCKERHUB_USERNAME }}/nginx:latest
+
+      - name: Upload Nginx scan result as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-nginx-report
+          path: trivy-nginx-report.json
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
   create-kind-cluster:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-     - name: Checkout code
-       uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-     - name: Setup Terraform
-       uses: hashicorp/setup-terraform@v2
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
 
-     - name: Setup Kind
-       uses: engineerd/setup-kind@v0.5.0
-       with:
-         version: "v0.17.0"
+      - name: Setup Kind
+        uses: engineerd/setup-kind@v0.5.0
+        with:
+          version: "v0.17.0"
 
-     - name: Initialize Terraform
-       working-directory: ./infra
-       run: terraform init -upgrade
+      - name: Initialize Terraform
+        working-directory: ./infra
+        run: terraform init -upgrade
 
-     - name: Apply Terraform Configuration
-       working-directory: ./infra
-       run: terraform apply -auto-approve
+      - name: Apply Terraform Configuration
+        working-directory: ./infra
+        run: terraform apply -auto-approve
 
-     - name: Verify cluster
-       run: |
-         kubectl get nodes
-         kubectl cluster-info
+      - name: Verify cluster
+        run: |
+          kubectl get nodes
+          kubectl cluster-info
