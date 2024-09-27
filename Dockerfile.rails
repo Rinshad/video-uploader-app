@@ -8,5 +8,4 @@ RUN gem install bundler -v 2.4.6
 
 # Install dependencies
 RUN bundle install
-
-ENTRYPOINT ["bundle", "exec"]
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
