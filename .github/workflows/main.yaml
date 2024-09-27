@@ -149,7 +149,7 @@ jobs:
         run: |
           cd Helm_Chart
           helm install video-uploader . -n video-uploader
-          sleep 30 
+          sleep 60 
 
       - name: Modify /etc/hosts
         run: |

@@ -1,18 +1,29 @@
-# The Code Challenge
-Welcome to the Code Challenge!
+## Application pipeline
+The Github workflow pipeline contains 2 job
 
-You have already received the requirement for this little project.
-Please consider this repository as a boilerplate for the future enhancements.
 
-## TODO
-- [ ] Make sure the application works as expected.
-- [ ] If you're not familiar with React, feel free to replace it with your
-  own favorite js framework.
-- [ ] Follow best practices for code maintainability.
+ 1. build-and-push => This job will build, scan and push images
+ 2. provision-kind-cluster => This job will provision a kind cluster and deploy the video-uploader application to the same cluster using Helm chart
 
----
+## Application deployment
+To deploy a new version of the application, make the changes in the code and push to repository, this will trigger the pipeline and the pipeline will perform the application containirization and deployment to the Kind cluster.
 
-## Setup
+## Improvement
+Application deployment can be made to perisistent with the help of statefulset deployment. Statefulset helps application to use the same storage in the event of a pod restart as well a grace shutdown of the application (or pods). 
+
+The terminationGracePeriodSeconds in the Stateful give a session time to users to complete the file upload.
+
+```shell
+spec:
+  terminationGracePeriodSeconds: 30
+  containers:
+  - name: api
+```
+
+## Kind cluster deployment
+Terraform used to provision the the kind cluster, 1 controlplane node and 2 worker node. Also, Nginx Ingress port maping also done as part othe cluster provisioning.
+
+
 
 ### Prerequisites
 
