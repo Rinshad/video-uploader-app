@@ -9,8 +9,8 @@ image:
   spa: "docker.io/rinshadr/spa:latest"
 
 secrets:
-  POSTGRES_PASSWORD: cGFzc3dvcmQ= # 'password' base64 encoded
-  DB_USER: cG9zdGdyZXM= # 'postgres' base64 encoded
+  POSTGRES_PASSWORD: cGFzc3dvcmQ= 
+  DB_USER: cG9zdGdyZXM= 
   SECRET_KEY_BASE: MWY1ZjJiODE4YWEyZmQ0Y2YyZTllMzU2ZjFhMjM1ZWRkNGEzYWMzZmNiYmY4ZTYxZDAyZjYyMTNmNDJkYWRkZjEwMGUwZWFkNzI5OWUyYWIwYjcyMTQwYWJhMjI4YWU0NGZjZmIyNmE5MTI1YzZjN2RkZGQ2NTdhZmVkMmQ1ZTk= # base64 encoded
 
 pvc:

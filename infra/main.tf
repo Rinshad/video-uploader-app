@@ -1,25 +1,45 @@
 terraform {
-          required_providers {
-            kind = {
-              source  = "tehcyx/kind"
-              version = "0.2.1"
-            }
-          }
-        }
+  required_providers {
+    kind = {
+      source  = "kind-io/kind"
+      version = "~> 0.5.0"  
+    }
+  }
+}
 
-        resource "kind_cluster" "default" {
-          name = "test-cluster"
-          kind_config {
-            kind = "Cluster"
-            api_version = "kind.x-k8s.io/v1alpha4"
-            node {
-              role = "control-plane"
-            }
-            node {
-              role = "worker"
-            }
-            node {
-              role = "worker"
-            }
-          }
-        }
+provider "kind" {}
+
+resource "kind_cluster" "my_cluster" {
+  name = "video-cluster"
+
+  node {
+    role = "control-plane"
+
+    kubeadm_config_patches = <<EOF
+kind: InitConfiguration
+nodeRegistration:
+  kubeletExtraArgs:
+    node-labels: "ingress-ready=true"
+EOF
+
+    extra_port_mappings {
+      container_port = 80
+      host_port      = 80
+      protocol       = "TCP"
+    }
+
+    extra_port_mappings {
+      container_port = 443
+      host_port      = 443
+      protocol       = "TCP"
+    }
+  }
+
+  node {
+    role = "worker"
+  }
+
+  node {
+    role = "worker"
+  }
+}
