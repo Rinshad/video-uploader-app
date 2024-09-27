@@ -51,6 +51,8 @@ jobs:
       - name: Ingress check
         run: |
           kubectl get ing -n video-uploader
+          sleep 30 
+          kubectl get ing -n video-uploader
 
       - name: Curl Test
         run: |
