@@ -52,10 +52,9 @@ jobs:
         run: |
           sudo echo "127.0.0.1 video-app.local" | sudo tee -a /etc/hosts
 
-      - name: Ingress check
+      - name: Application Test
         run: |
           kubectl get ing -n video-uploader
           sleep 20 
-          kubectl get ing -n video-uploader
           kubectl run test-pod --image=busybox --rm -it -- wget -qO- http://nginx.video-uploader.svc.cluster.local:8000
  
