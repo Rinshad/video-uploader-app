@@ -55,6 +55,8 @@ jobs:
       - name: Application Test
         run: |
           kubectl get ing -n video-uploader
+          kubectl get pods -n video-uploader
+          kubectl get svc -n video-uploader
           sleep 20 
           kubectl run test-pod --image=busybox --rm -it -- wget -qO- http://nginx.video-uploader.svc.cluster.local:8000
  
