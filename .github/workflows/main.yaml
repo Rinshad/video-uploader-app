@@ -37,7 +37,8 @@ jobs:
 
       - name: Deploy Helm Chart
         run: |
-          helm install video-uploader ./Helm_chart/video-uploader-0.1.0.tgz
+          cd Helm_Chart
+          helm install video-uploader .
 
       - name: Modify /etc/hosts
         run: |
