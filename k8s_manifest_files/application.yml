@@ -4,9 +4,9 @@ metadata:
   name: db-secret
 type: Opaque
 data:
-  POSTGRES_PASSWORD: cGFzc3dvcmQ= # 'password' base64 encoded
-  DB_USER: cG9zdGdyZXM= # 'postgres' base64 encoded
-  SECRET_KEY_BASE: MWY1ZjJiODE4YWEyZmQ0Y2YyZTllMzU2ZjFhMjM1ZWRkNGEzYWMzZmNiYmY4ZTYxZDAyZjYyMTNmNDJkYWRkZjEwMGUwZWFkNzI5OWUyYWIwYjcyMTQwYWJhMjI4YWU0NGZjZmIyNmE5MTI1YzZjN2RkZGQ2NTdhZmVkMmQ1ZTk= # base64 encoded
+  POSTGRES_PASSWORD: cGFzc3dvcmQ= 
+  DB_USER: cG9zdGdyZXM= 
+  SECRET_KEY_BASE: MWY1ZjJiODE4YWEyZmQ0Y2YyZTllMzU2ZjFhMjM1ZWRkNGEzYWMzZmNiYmY4ZTYxZDAyZjYyMTNmNDJkYWRkZjEwMGUwZWFkNzI5OWUyYWIwYjcyMTQwYWJhMjI4YWU0NGZjZmIyNmE5MTI1YzZjN2RkZGQ2NTdhZmVkMmQ1ZTk= 
 
 ---
 apiVersion: v1
@@ -99,7 +99,7 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   hostPath:
-    path: /mnt/data/nginx # Adjust this path as needed
+    path: /mnt/data/nginx 
 
 ---
 apiVersion: v1
@@ -141,12 +141,12 @@ metadata:
   name: api-pv
 spec:
   capacity:
-    storage: 1Gi # Adjust size as needed
+    storage: 1Gi 
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   hostPath:
-    path: /mnt/data/api # Adjust this path as needed
+    path: /mnt/data/api 
 
 ---
 apiVersion: v1
