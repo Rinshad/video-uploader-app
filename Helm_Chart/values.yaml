@@ -4,7 +4,7 @@ image:
   postgres: "postgres:12.8"
   nginx: "docker.io/rinshadr/nginx:latest"
   redis: "redis:7.0.8"
-  api: "docker.io/rinshadr/api:v0.0.1"
+  api: "docker.io/rinshadr/api:latest"
   sidekiq: "docker.io/rinshadr/sidekiq:latest"
   spa: "docker.io/rinshadr/spa:latest"
 

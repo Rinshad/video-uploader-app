@@ -100,7 +100,6 @@ jobs:
   
       - name: Scan Nginx image with Trivy
         run: |
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/nginx:latest
           trivy image --format json --output trivy-nginx-report.json ${{ secrets.DOCKERHUB_USERNAME }}/nginx:latest
   
       - name: Upload Nginx scan result as artifact
