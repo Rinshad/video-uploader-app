@@ -12,7 +12,7 @@ provider "null" {}
 resource "null_resource" "create_kind_cluster" {
   provisioner "local-exec" {
     command = <<EOT
-      kind create cluster --config=-
+      echo "
       kind: Cluster
       apiVersion: kind.x-k8s.io/v1alpha4
       nodes:
@@ -22,7 +22,7 @@ resource "null_resource" "create_kind_cluster" {
           kind: InitConfiguration
           nodeRegistration:
             kubeletExtraArgs:
-              node-labels: "ingress-ready=true"
+              node-labels: 'ingress-ready=true'
         extraPortMappings:
         - containerPort: 80
           hostPort: 80
@@ -32,6 +32,10 @@ resource "null_resource" "create_kind_cluster" {
           protocol: TCP
       - role: worker
       - role: worker
+      " > kind-config.yaml
+      
+      kind create cluster --config kind-config.yaml
+      rm kind-config.yaml
     EOT
   }
 }
