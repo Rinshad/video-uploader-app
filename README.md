@@ -1,6 +1,5 @@
 ## Application pipeline
-The Github workflow pipeline contains 2 job
-
+The Github workflow pipeline contains 2 job, more details are given below.
 
  1. build-and-push => This job will build, scan and push images
  2. provision-kind-cluster => This job will provision a kind cluster and deploy the video-uploader application to the same cluster using Helm chart
@@ -23,8 +22,13 @@ spec:
 ## Kind cluster deployment
 Terraform used to provision the the kind cluster, 1 controlplane node and 2 worker node. Also, Nginx Ingress port maping also done as part othe cluster provisioning.
 
+## Code scanning using sonarqube
+Sonarqube cloud scanning is used for application code scanning and it is integrated to the Github pipeline.
 
+## Container Image scanning using Trivy.
+Trivy is a comprehensive security scanner for container images, It helps in identifying vulnerabilities, misconfigurations, and other security issues in docker images. Trivy scan tool also integrated with the Github pipeline.
 
+## Development and Testing
 ### Prerequisites
 
 - [Docker](https://www.docker.com/)
