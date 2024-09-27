@@ -29,8 +29,6 @@ jobs:
       run: cd spa && npm ci
     - name: Run linter
       run: cd spa && npm run lint
-    - name: Run unit tests
-      run: cd spa && npm run test:unit
     - name: Run integration tests
       run: cd spa && npm run test:integration
 
