@@ -1,4 +1,4 @@
-name: Provision Kind Cluster
+name: Provision Kind Cluster and deploy application
 
 on:
   push:
@@ -34,6 +34,10 @@ jobs:
       - name: Install Helm
         run: |
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      
+      - name: Create Namespace
+        run: |
+          kubectl create namespace video-uploader || echo "Namespace video-uploader already exists"
 
       - name: Deploy Helm Chart
         run: |
