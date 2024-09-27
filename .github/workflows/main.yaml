@@ -26,6 +26,10 @@ jobs:
         working-directory: ./infra
         run: terraform apply -auto-approve
 
+      - name: Cluster uptime
+        run: |
+          sleep 30 
+
       - name: Verify Kind Cluster
         run: |
           kubectl get nodes
