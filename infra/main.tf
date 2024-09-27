@@ -1,45 +1,37 @@
 terraform {
   required_providers {
-    kind = {
-      source  = "kind-io/kind"
-      version = "~> 0.5.0"  
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.0"
     }
   }
 }
 
-provider "kind" {}
+provider "null" {}
 
-resource "kind_cluster" "my_cluster" {
-  name = "video-cluster"
-
-  node {
-    role = "control-plane"
-
-    kubeadm_config_patches = <<EOF
-kind: InitConfiguration
-nodeRegistration:
-  kubeletExtraArgs:
-    node-labels: "ingress-ready=true"
-EOF
-
-    extra_port_mappings {
-      container_port = 80
-      host_port      = 80
-      protocol       = "TCP"
-    }
-
-    extra_port_mappings {
-      container_port = 443
-      host_port      = 443
-      protocol       = "TCP"
-    }
-  }
-
-  node {
-    role = "worker"
-  }
-
-  node {
-    role = "worker"
+resource "null_resource" "create_kind_cluster" {
+  provisioner "local-exec" {
+    command = <<EOT
+      kind create cluster --config=-
+      kind: Cluster
+      apiVersion: kind.x-k8s.io/v1alpha4
+      nodes:
+      - role: control-plane
+        kubeadmConfigPatches:
+        - |
+          kind: InitConfiguration
+          nodeRegistration:
+            kubeletExtraArgs:
+              node-labels: "ingress-ready=true"
+        extraPortMappings:
+        - containerPort: 80
+          hostPort: 80
+          protocol: TCP
+        - containerPort: 443
+          hostPort: 443
+          protocol: TCP
+      - role: worker
+      - role: worker
+    EOT
   }
 }
