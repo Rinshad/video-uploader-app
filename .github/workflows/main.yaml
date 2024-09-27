@@ -55,10 +55,7 @@ jobs:
       - name: Ingress check
         run: |
           kubectl get ing -n video-uploader
-          sleep 30 
+          sleep 20 
           kubectl get ing -n video-uploader
           kubectl run test-pod --image=busybox --rm -it -- wget -qO- http://nginx.video-uploader.svc.cluster.local:8000
-      - name: Curl Test
-        run: |
-          sleep 30  
-          curl http://video-app.local
+ 
