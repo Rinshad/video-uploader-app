@@ -46,12 +46,12 @@ jobs:
 
       - name: Modify /etc/hosts
         run: |
-          echo "127.0.0.1 video-app.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 video-app.local" | sudo tee -a /etc/hosts
 
       - name: Ingress check
         run: |
           kubectl get ing -n video-uploader
-          sleep 30 
+          sleep 60 
           kubectl get ing -n video-uploader
 
       - name: Curl Test
