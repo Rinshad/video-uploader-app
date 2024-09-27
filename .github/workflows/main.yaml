@@ -30,3 +30,20 @@ jobs:
         run: |
           kubectl get nodes
           kubectl cluster-info
+
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Deploy Helm Chart
+        run: |
+          helm install video-uploader ./Helm_chart/video-uploader-0.1.0.tgz
+
+      - name: Modify /etc/hosts
+        run: |
+          echo "127.0.0.1 video-app.local" | sudo tee -a /etc/hosts
+
+      - name: Curl Test
+        run: |
+          sleep 30  
+          curl http://video-app.local
