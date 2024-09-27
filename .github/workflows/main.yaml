@@ -48,6 +48,10 @@ jobs:
         run: |
           echo "127.0.0.1 video-app.local" | sudo tee -a /etc/hosts
 
+      - name: Ingress check
+        run: |
+          kubectl get ing -n video-uploader
+
       - name: Curl Test
         run: |
           sleep 30  
