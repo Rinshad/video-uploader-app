@@ -1,0 +1,30 @@
+namespace: video-uploader
+
+image:
+  postgres: "postgres:12.8"
+  nginx: "docker.io/rinshadr/nginx:latest"
+  redis: "redis:7.0.8"
+  api: "docker.io/rinshadr/api:v0.0.1"
+  sidekiq: "docker.io/rinshadr/sidekiq:latest"
+  spa: "docker.io/rinshadr/spa:latest"
+
+secrets:
+  POSTGRES_PASSWORD: cGFzc3dvcmQ= # 'password' base64 encoded
+  DB_USER: cG9zdGdyZXM= # 'postgres' base64 encoded
+  SECRET_KEY_BASE: MWY1ZjJiODE4YWEyZmQ0Y2YyZTllMzU2ZjFhMjM1ZWRkNGEzYWMzZmNiYmY4ZTYxZDAyZjYyMTNmNDJkYWRkZjEwMGUwZWFkNzI5OWUyYWIwYjcyMTQwYWJhMjI4YWU0NGZjZmIyNmE5MTI1YzZjN2RkZGQ2NTdhZmVkMmQ1ZTk= # base64 encoded
+
+pvc:
+  nginx:
+    storage: "500Mi"
+  api:
+    storage: "1Gi"
+  postgres:
+    storage: "1Gi"
+
+replicaCount:
+  postgres: 1
+  nginx: 1
+  redis: 1
+  api: 1
+  sidekiq: 1
+  spa: 1

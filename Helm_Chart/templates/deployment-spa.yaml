@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spa
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount.spa }}
+  selector:
+    matchLabels:
+      app: spa
+  template:
+    metadata:
+      labels:
+        app: spa
+    spec:
+      containers:
+      - name: spa
+        image: {{ .Values.image.spa }}
+        ports:
+        - containerPort: 4000

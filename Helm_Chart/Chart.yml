@@ -1,0 +1,4 @@
+apiVersion: v2
+name: video-uploader
+description: A Helm chart for deploying video uploader application
+version: 0.1.0

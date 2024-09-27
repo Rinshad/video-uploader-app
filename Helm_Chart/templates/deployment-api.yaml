@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount.api }}
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: {{ .Values.image.api }}
+        ports:
+        - containerPort: 3000
+        env:
+        - name: REDIS_URL
+          value: 'redis://redis:6379/1'
+        - name: DB_HOST
+          value: postgres
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: DB_USER
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: POSTGRES_PASSWORD
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: SECRET_KEY_BASE
+        volumeMounts:
+        - name: api-storage
+          mountPath: /app/storage
+      volumes:
+      - name: api-storage
+        persistentVolumeClaim:
+          claimName: api-pvc
