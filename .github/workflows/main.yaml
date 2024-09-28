@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -13,27 +13,27 @@ jobs:
   lint-and-test:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3   
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '14'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
 
-    - name: Cache dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.npm
-        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.OS }}-node-
-            
-    - name: Install dependencies
-      run: cd spa && npm ci
-      
-    - name: Run linter
-      run: cd spa && npm run lint
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+
+      - name: Install dependencies
+        run: cd spa && npm ci
+
+      - name: Run linter
+        run: cd spa && npm run lint
 
   build-and-push:
     runs-on: ubuntu-latest
@@ -44,83 +44,72 @@ jobs:
         dockerfile: [Dockerfile.rails, Dockerfile.rails, Dockerfile.react, Dockerfile.nginx]
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-    - name: Login to DockerHub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build and scan image
-      run: |
-        docker buildx build --platform linux/amd64 --file ${{ matrix.dockerfile }} --tag ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:latest .
-        trivy image --exit-code 0 --ignore-unfixed --severity CRITICAL,HIGH --format table ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:latest
-        docker push ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:latest   
-        
+      - name: Build and scan image
+        run: |
+          docker buildx build --platform linux/amd64 --file ${{ matrix.dockerfile }} --tag ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:latest .
+          trivy image --exit-code 0 --ignore-unfixed --severity CRITICAL,HIGH --format table ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:latest   
+
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
-    steps:
-    - uses: actions/checkout@v3
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.3.0
-    - name: Initialize Terraform
-      run: terraform init -upgrade
-      working-directory: ./infra
-    - name: Apply Terraform Configuration
-      run: terraform apply -auto-approve
-      working-directory: ./infra
-    - name: Initialize Terraform for app
-      working-directory: ./app-deploy
-      run: terraform init
-    - name: Apply Terraform Configuration for application
-      working-directory: ./app-deploy
-      run: |
-        sleep 30
-        terraform apply -auto-approve
-    - name: Run Smoke Tests
-      run: |
-        sleep 40
-        kubectl get pods,services,ing -n video-uploader
-        kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- \
-        curl -m 5 http://nginx.video-uploader.svc.cluster.local:8000/health
-
- #   - name: Install Helm
- #     run: |
- #       sleep 30
- #       curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
     
- #   - name: Deploy Helm Chart
- #     run: |
- #       helm upgrade --install video-uploader ./Helm_Chart -n video-uploader --create-namespace \
- #         --set image.tag=latest
+    steps:
+      - uses: actions/checkout@v3
 
-    - name: Run Smoke Tests
-      run: |
-        sleep 40
-        kubectl get pods,services,ing -n video-uploader
-        kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- \
-        curl -m 5 http://nginx.video-uploader.svc.cluster.local:8000/health
-        
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.3.0
 
-     notify:
-        runs-on: ubuntu-latest
-        needs: [deploy]
-        if: always()
-        steps:
-        - name: Notify Slack
-          uses: 8398a7/action-slack@v3
-          with:
-            status: ${{ job.status }}
-            text: Deployment ${{ job.status == 'success' && 'succeeded' || 'failed' }}!
-          env:
-            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      - name: Initialize Terraform
+        run: terraform init -upgrade
+        working-directory: ./infra
+
+      - name: Apply Terraform Configuration
+        run: terraform apply -auto-approve
+        working-directory: ./infra
+
+      - name: Initialize Terraform for app
+        working-directory: ./app-deploy
+        run: terraform init
+
+      - name: Apply Terraform Configuration for application
+        working-directory: ./app-deploy
+        run: |
+          sleep 30
+          terraform apply -auto-approve
+
+      - name: Run Smoke Tests
+        run: |
+          sleep 40
+          kubectl get pods,services,ing -n video-uploader
+          kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- \
+          curl -m 5 http://nginx.video-uploader.svc.cluster.local:8000/health
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always()
+    steps:
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: Deployment ${{ job.status == 'success' && 'succeeded' || 'failed' }}!
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
