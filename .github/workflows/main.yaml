@@ -91,6 +91,7 @@ jobs:
       
       - name: Debug Info
         run: |
+          sleep 30
           kubectl cluster-info
           kubectl get nodes
 
