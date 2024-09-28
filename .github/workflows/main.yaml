@@ -91,13 +91,13 @@ jobs:
 
       - name: Initialize Terraform for app
         working-directory: ./app-deploy
-        run: terraform init
+        run: |
+          sleep 30
+          terraform init
 
       - name: Apply Terraform Configuration for application
         working-directory: ./app-deploy
-        run: |
-          sleep 30
-          terraform apply -auto-approve
+        run: terraform apply -auto-approve
 
       - name: Run Smoke Tests
         run: |
