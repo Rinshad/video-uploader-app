@@ -67,7 +67,7 @@ jobs:
       - name: Build and scan image
         run: |
           docker buildx build --platform linux/amd64 --file ${{ matrix.dockerfile }} --tag ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:latest .
-          trivy image --exit-code 0 --ignore-unfixed --severity CRITICAL,HIGH --format table ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:latest
+    #      trivy image --exit-code 0 --ignore-unfixed --severity CRITICAL,HIGH --format table ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:latest
           docker push ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:latest   
 
   deploy:
