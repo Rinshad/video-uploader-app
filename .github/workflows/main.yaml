@@ -64,11 +64,15 @@ jobs:
           wget https://github.com/aquasecurity/trivy/releases/download/v0.32.1/trivy_0.32.1_Linux-64bit.deb
           sudo dpkg -i trivy_0.32.1_Linux-64bit.deb
 
-      - name: Build and scan image
-        run: |
-          docker buildx build --platform linux/amd64 --file ${{ matrix.dockerfile }} --tag ${{ env.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:latest --push .
-    
-
+      - name: Build and push SPA image
+        run: docker buildx build --platform linux/amd64 --file Dockerfile.react --tag ${{ secrets.DOCKERHUB_USERNAME }}/spa:latest --push .
+             
+      - name: Build and push API image
+        run: docker buildx build --platform linux/amd64 --file Dockerfile.rails --tag ${{ secrets.DOCKERHUB_USERNAME }}/spa:latest --push .
+             
+      - name: Build and push NGINX image
+        run: docker buildx build --platform linux/amd64 --file Dockerfile.nginx --tag ${{ secrets.DOCKERHUB_USERNAME }}/spa:latest --push .
+          
   deploy:
     runs-on: ubuntu-latest
     needs: build-scan-push
