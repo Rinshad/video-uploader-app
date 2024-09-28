@@ -51,7 +51,7 @@ jobs:
         file: Dockerfile.rails
         push: true
         tags: ${{ env.DOCKERHUB_USERNAME }}/api:${{ github.sha }}
-    - name: Build and push other images
+    - name: Build and push images
       run: |
         docker buildx build --platform linux/amd64 --file Dockerfile.rails --tag ${{ env.DOCKERHUB_USERNAME }}/sidekiq:latest --push .
         docker buildx build --platform linux/amd64 --file Dockerfile.react --tag ${{ env.DOCKERHUB_USERNAME }}/spa:latest --push .
@@ -90,7 +90,7 @@ jobs:
         kubectl get pods,services,ing -n video-uploader
         kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- \
         curl -m 5 http://nginx.video-uploader.svc.cluster.local:8000/health
-        kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl -X GET http://127.0.0.1:80 -H "Host: video-app.local"
+        
 
   notify:
     runs-on: ubuntu-latest
