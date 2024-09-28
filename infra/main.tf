@@ -1,7 +1,15 @@
+terraform {
+  required_providers {
+    kind = {
+      source = "tehcyx/kind"
+      version = "0.6.0"
+    }
+  }
+}
 provider "kind" {}
 
 resource "kind_cluster" "default" {
-    name           = "video-uploader-cluster"
+    name           = "kind"
     wait_for_ready = true
 
   kind_config {
@@ -25,6 +33,9 @@ resource "kind_cluster" "default" {
           }
       }
 
+      node {
+          role = "worker"
+      }
       node {
           role = "worker"
       }

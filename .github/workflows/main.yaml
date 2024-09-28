@@ -83,10 +83,10 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.5.0
+          terraform_version: 1.9.6
 
       - name: Initialize Terraform
-        run: terraform init -upgrade
+        run: terraform init 
         working-directory: ./infra
 
       - name: Apply Terraform Configuration
