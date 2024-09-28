@@ -20,6 +20,5 @@ resource "helm_release" "video_uploader" {
   }
   timeout {
     install = 600  # Increase to 600 seconds (10 minutes)
-    upgrade = 600  # Increase to 600 seconds (10 minutes)
   }
 }
