@@ -85,13 +85,15 @@ jobs:
         with:
           terraform_version: 1.9.6
 
-      - name: Initialize Terraform
-        run: terraform init 
-        working-directory: ./infra
+     # - name: Initialize Terraform
+     #  run: terraform init 
+    #  working-directory: ./kind_cluster
 
       - name: Apply Terraform Configuration
-        run: terraform apply -auto-approve
-        working-directory: ./infra
+        run: |
+          terraform init
+          terraform apply -auto-approve
+        working-directory: ./kind_cluster
       
       - name: Debug Info
         run: |
@@ -111,8 +113,7 @@ jobs:
           sleep 30
           kubectl get pods,services,ing -n video-uploader
           kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl -m 10 http://nginx.video-uploader.svc.cluster.local:8000/health
-          kubectl get pods -n video-uploader -o wide
-          kubectl describe svc nginx -n video-uploader
+
 
   notify:
      runs-on: ubuntu-latest
