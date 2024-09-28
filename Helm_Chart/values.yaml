@@ -5,7 +5,7 @@ image:
   nginx: "docker.io/rrabab/nginx:latest"
   redis: "redis:7.0.8"
   api: "docker.io/rrabab/api:latest"
-  sidekiq: "docker.io/rrabab/sidekiq:latest"
+  sidekiq: "docker.io/rrabab/api:latest"
   spa: "docker.io/rrabab/spa:latest"
 
 secrets:
