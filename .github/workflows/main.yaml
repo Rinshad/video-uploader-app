@@ -35,43 +35,43 @@ jobs:
       - name: Run linter
         run: cd spa && npm run lint
 
-  #build-scan-push:
-  #  runs-on: ubuntu-latest
-  #  needs: lint-and-test
-  #  #strategy:
-  #  #  matrix:
-  #  #    image_name: [api, sidekiq, spa, nginx]
-  #  #    dockerfile: [Dockerfile.rails, Dockerfile.rails, Dockerfile.react, Dockerfile.nginx]
-#
-  #  steps:
-  #    - uses: actions/checkout@v3
-#
-  #    - name: Set up QEMU
-  #      uses: docker/setup-qemu-action@v2
-#
-  #    - name: Set up Docker Buildx
-  #      uses: docker/setup-buildx-action@v2
-#
-  #    - name: Login to DockerHub
-  #      uses: docker/login-action@v2
-  #      with:
-  #        username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #        password: ${{ secrets.DOCKERHUB_TOKEN }}
-  #  
-  #    - name: Install Trivy
-  #      run: |
-  #        sudo apt-get update && sudo apt-get install -y wget
-  #        wget https://github.com/aquasecurity/trivy/releases/download/v0.32.1/trivy_0.32.1_Linux-64bit.deb
-  #        sudo dpkg -i trivy_0.32.1_Linux-64bit.deb
-#
-  #    - name: Build and push SPA image
-  #      run: docker buildx build --platform linux/amd64 --file Dockerfile.react --tag ${{ secrets.DOCKERHUB_USERNAME }}/spa:latest --push .
-  #           
-  #    - name: Build and push API image
-  #      run: docker buildx build --platform linux/amd64 --file Dockerfile.rails --tag ${{ secrets.DOCKERHUB_USERNAME }}/api:latest --push .
-  #           
-  #    - name: Build and push NGINX image
-  #      run: docker buildx build --platform linux/amd64 --file Dockerfile.nginx --tag ${{ secrets.DOCKERHUB_USERNAME }}/nginx:latest --push .
+  build-scan-push:
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    #strategy:
+    #  matrix:
+    #    image_name: [api, sidekiq, spa, nginx]
+    #    dockerfile: [Dockerfile.rails, Dockerfile.rails, Dockerfile.react, Dockerfile.nginx]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+      - name: Install Trivy
+        run: |
+          sudo apt-get update && sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.32.1/trivy_0.32.1_Linux-64bit.deb
+          sudo dpkg -i trivy_0.32.1_Linux-64bit.deb
+
+      - name: Build and push SPA image
+        run: docker buildx build --platform linux/amd64 --file Dockerfile.react --tag ${{ secrets.DOCKERHUB_USERNAME }}/spa:latest --push .
+             
+      - name: Build and push API image
+        run: docker buildx build --platform linux/amd64 --file Dockerfile.rails --tag ${{ secrets.DOCKERHUB_USERNAME }}/api:latest --push .
+             
+      - name: Build and push NGINX image
+        run: docker buildx build --platform linux/amd64 --file Dockerfile.nginx --tag ${{ secrets.DOCKERHUB_USERNAME }}/nginx:latest --push .
           
   deploy:
     runs-on: ubuntu-latest
@@ -105,11 +105,10 @@ jobs:
         working-directory: ./kind_cluster
           
 
-      - name: Initialize Terraform for app
-        run: terraform init
-
-      - name: Apply Terraform Configuration for application
-        run: terraform apply -auto-approve
+      - name: Application deployment
+        run: |
+          terraform init
+          terraform apply -auto-approve
 
       - name: Run Smoke Tests
         run: |
@@ -123,10 +122,10 @@ jobs:
      needs: [deploy]  
      if: always()  
      steps:
-       - name: Notify Slack
+       - name: Notify Deployment Status Slack
          uses: 8398a7/action-slack@v3
          with:
-           status: ${{ needs.deploy.result }}  # Use the result of the deploy job
+           status: ${{ needs.deploy.result }} 
            text: Deployment ${{ needs.deploy.result == 'success' && 'succeeded' || 'failed' }}!
          env:
            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
