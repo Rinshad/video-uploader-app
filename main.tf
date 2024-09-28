@@ -11,7 +11,7 @@ resource "helm_release" "video_uploader" {
   chart            = "${path.root}/../Helm_Chart"
 
   values = [
-    file("${path.module}/../Helm_Chart/values.yaml")
+    file("${path.module}/Helm_Chart/values.yaml")
   ]
 
   set {
