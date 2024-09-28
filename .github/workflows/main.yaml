@@ -95,15 +95,25 @@ jobs:
           kubectl cluster-info
           kubectl get nodes
 
-      - name: Initialize Terraform for app
-        working-directory: ./app-deploy
+    #  - name: Initialize Terraform for app
+    #    working-directory: ./app-deploy
+    #    run: |
+    #      sleep 30
+    #      terraform init
+#
+    #  - name: Apply Terraform Configuration for application
+    #    working-directory: ./app-deploy
+    #    run: terraform apply -auto-approve
+
+      - name: Install Helm
         run: |
           sleep 30
-          terraform init
-
-      - name: Apply Terraform Configuration for application
-        working-directory: ./app-deploy
-        run: terraform apply -auto-approve
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    
+      - name: Deploy Helm Chart
+        run: |
+         helm upgrade --install video-uploader ./Helm_Chart -n video-uploader --create-namespace \
+          --set image.tag=latest
 
       - name: Run Smoke Tests
         run: |
