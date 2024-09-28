@@ -53,9 +53,9 @@ jobs:
         tags: ${{ env.DOCKERHUB_USERNAME }}/api:${{ github.sha }}
     - name: Build and push other images
       run: |
-        docker buildx build --platform linux/amd64 --file Dockerfile.rails --tag ${{ env.DOCKERHUB_USERNAME }}/sidekiq:${{ github.sha }} --push .
-        docker buildx build --platform linux/amd64 --file Dockerfile.react --tag ${{ env.DOCKERHUB_USERNAME }}/spa:${{ github.sha }} --push .
-        docker buildx build --platform linux/amd64 --file Dockerfile.nginx --tag ${{ env.DOCKERHUB_USERNAME }}/nginx:${{ github.sha }} --push .
+        docker buildx build --platform linux/amd64 --file Dockerfile.rails --tag ${{ env.DOCKERHUB_USERNAME }}/sidekiq:latest --push .
+        docker buildx build --platform linux/amd64 --file Dockerfile.react --tag ${{ env.DOCKERHUB_USERNAME }}/spa:latest --push .
+        docker buildx build --platform linux/amd64 --file Dockerfile.nginx --tag ${{ env.DOCKERHUB_USERNAME }}/nginx:latest --push .
 
   deploy:
     runs-on: ubuntu-latest
@@ -74,14 +74,18 @@ jobs:
       working-directory: ./infra
     - name: Install Helm
       run: |
+        sleep 30
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    
     - name: Deploy Helm Chart
       run: |
         helm upgrade --install video-uploader ./Helm_Chart -n video-uploader --create-namespace \
-          --set image.tag=${{ github.sha }}
+          --set image.tag=latest
 
     - name: Run Smoke Tests
       run: |
+        sleep 30
+        kubectl get pods,services,ing
         kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- \
         curl -m 5 http://nginx.video-uploader.svc.cluster.local:8000/health
 
