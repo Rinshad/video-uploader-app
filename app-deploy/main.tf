@@ -17,7 +17,5 @@ resource "helm_release" "video_uploader" {
   set {
     name  = "image.tag"
     value = "latest"
-  }
-  timeout = 600  # Increase to 600 seconds (10 minutes)
-
+  } 
 }
