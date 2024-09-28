@@ -2,11 +2,11 @@ namespace: video-uploader
 
 image:
   postgres: "postgres:12.8"
-  nginx: "docker.io/rinshadr/nginx:latest"
+  nginx: "docker.io/rrabab/nginx:latest"
   redis: "redis:7.0.8"
-  api: "docker.io/rinshadr/api:latest"
-  sidekiq: "docker.io/rinshadr/sidekiq:latest"
-  spa: "docker.io/rinshadr/spa:latest"
+  api: "docker.io/rrabab/api:latest"
+  sidekiq: "docker.io/rrabab/sidekiq:latest"
+  spa: "docker.io/rrabab/spa:latest"
 
 secrets:
   POSTGRES_PASSWORD: cGFzc3dvcmQ= 
