@@ -38,10 +38,10 @@ jobs:
   build-scan-push:
     runs-on: ubuntu-latest
     needs: lint-and-test
-    strategy:
-      matrix:
-        image_name: [api, sidekiq, spa, nginx]
-        dockerfile: [Dockerfile.rails, Dockerfile.rails, Dockerfile.react, Dockerfile.nginx]
+    #strategy:
+    #  matrix:
+    #    image_name: [api, sidekiq, spa, nginx]
+    #    dockerfile: [Dockerfile.rails, Dockerfile.rails, Dockerfile.react, Dockerfile.nginx]
 
     steps:
       - uses: actions/checkout@v3
