@@ -86,11 +86,11 @@ jobs:
 
     - name: Run Smoke Tests
       run: |
-        sleep 30
+        sleep 40
         kubectl get pods,services,ing -n video-uploader
         kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- \
         curl -m 5 http://nginx.video-uploader.svc.cluster.local:8000/health
-        curl -X GET http://127.0.0.1:80 -H "Host: video-app.local"
+        kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl -X GET http://127.0.0.1:80 -H "Host: video-app.local"
 
   notify:
     runs-on: ubuntu-latest
