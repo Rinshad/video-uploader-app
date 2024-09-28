@@ -8,7 +8,7 @@ resource "helm_release" "video_uploader" {
   name             = "video-uploader"
   namespace        = "video-uploader"
   create_namespace = true
-  chart            = "${path.root}/../Helm_Chart"
+  chart            = "${path.module}/Helm_Chart"
 
   values = [
     file("${path.module}/Helm_Chart/values.yaml")
