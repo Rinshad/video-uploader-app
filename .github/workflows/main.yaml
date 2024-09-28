@@ -85,21 +85,24 @@ jobs:
         with:
           terraform_version: 1.9.6
 
-     # - name: Initialize Terraform
-     #  run: terraform init 
-    #  working-directory: ./kind_cluster
-
-      - name: Apply Terraform Configuration
+      - name: Deploy kind cluster
         run: |
           terraform init
           terraform apply -auto-approve
         working-directory: ./kind_cluster
       
-      - name: Debug Info
+      - name: Wait for Kind Cluster to be ready
         run: |
-          sleep 30
-          kubectl cluster-info
-          kubectl get nodes
+          echo "Waiting for Kind cluster to be ready..."
+          for i in {1..30}; do
+            if kubectl get nodes | grep -q "Ready"; then
+              echo "Kind cluster is ready!"
+              break
+            fi
+            echo "Waiting for 10 seconds..."
+            sleep 10
+          done
+        working-directory: ./kind_cluster
           
 
       - name: Initialize Terraform for app
