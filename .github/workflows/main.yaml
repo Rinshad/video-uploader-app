@@ -74,11 +74,14 @@ jobs:
       run: terraform apply -auto-approve
       working-directory: ./infra
 
+    - name: Initialize Terraform for app
+      working-directory: ./app-deploy
+      run: terraform init
+
     - name: Apply Terraform Configuration for application
       working-directory: ./app-deploy
       run: |
         sleep 30
-        terraform init
         terraform apply -auto-approve
 
  #   - name: Install Helm
