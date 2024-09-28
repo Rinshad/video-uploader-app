@@ -117,7 +117,7 @@ jobs:
 
       - name: Run Smoke Tests
         run: |
-          sleep 40
+          sleep 60
           kubectl get pods,services,ing -n video-uploader
           kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- \
           curl -m 5 http://nginx.video-uploader.svc.cluster.local:8000/health
