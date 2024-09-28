@@ -1,41 +1,32 @@
-terraform {
-  required_providers {
-    null = {
-      source  = "hashicorp/null"
-      version = "~> 3.0"
-    }
-  }
-}
+provider "kind" {}
 
-provider "null" {}
+resource "kind_cluster" "default" {
+    name           = "video-uploader-cluster"
+    wait_for_ready = true
 
-resource "null_resource" "create_kind_cluster" {
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "
-      kind: Cluster
-      apiVersion: kind.x-k8s.io/v1alpha4
-      nodes:
-      - role: control-plane
-        kubeadmConfigPatches:
-        - |
-          kind: InitConfiguration
-          nodeRegistration:
-            kubeletExtraArgs:
-              node-labels: 'ingress-ready=true'
-        extraPortMappings:
-        - containerPort: 80
-          hostPort: 80
-          protocol: TCP
-        - containerPort: 443
-          hostPort: 443
-          protocol: TCP
-      - role: worker
-      - role: worker
-      " > kind-config.yaml
-      
-      kind create cluster --config kind-config.yaml
-      rm kind-config.yaml
-    EOT
+  kind_config {
+      kind        = "Cluster"
+      api_version = "kind.x-k8s.io/v1alpha4"
+
+      node {
+          role = "control-plane"
+
+          kubeadm_config_patches = [
+              "kind: InitConfiguration\nnodeRegistration:\n  kubeletExtraArgs:\n    node-labels: \"ingress-ready=true\"\n"
+          ]
+
+          extra_port_mappings {
+              container_port = 80
+              host_port      = 80
+          }
+          extra_port_mappings {
+              container_port = 443
+              host_port      = 443
+          }
+      }
+
+      node {
+          role = "worker"
+      }
   }
 }
