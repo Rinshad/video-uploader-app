@@ -74,15 +74,22 @@ jobs:
       run: terraform apply -auto-approve
       working-directory: ./infra
 
-    - name: Install Helm
+    - name: Apply Terraform Configuration for application
+      working-directory: ./app-deploy
       run: |
         sleep 30
-        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        terraform init
+        terraform apply -auto-approve
+
+ #   - name: Install Helm
+ #     run: |
+ #       sleep 30
+ #       curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
     
-    - name: Deploy Helm Chart
-      run: |
-        helm upgrade --install video-uploader ./Helm_Chart -n video-uploader --create-namespace \
-          --set image.tag=latest
+ #   - name: Deploy Helm Chart
+ #     run: |
+ #       helm upgrade --install video-uploader ./Helm_Chart -n video-uploader --create-namespace \
+ #         --set image.tag=latest
 
     - name: Run Smoke Tests
       run: |
