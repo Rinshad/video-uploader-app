@@ -69,9 +69,11 @@ jobs:
     - name: Initialize Terraform
       run: terraform init -upgrade
       working-directory: ./infra
+
     - name: Apply Terraform Configuration
       run: terraform apply -auto-approve
       working-directory: ./infra
+
     - name: Install Helm
       run: |
         sleep 30
@@ -85,9 +87,10 @@ jobs:
     - name: Run Smoke Tests
       run: |
         sleep 30
-        kubectl get pods,services,ing
+        kubectl get pods,services,ing -n video-uploader
         kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- \
         curl -m 5 http://nginx.video-uploader.svc.cluster.local:8000/health
+        curl -X GET http://127.0.0.1:80 -H "Host: video-app.local"
 
   notify:
     runs-on: ubuntu-latest
