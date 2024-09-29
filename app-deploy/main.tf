@@ -4,6 +4,11 @@ provider "helm" {
   }
 }
 
+variable "image_tag" {
+  type    = string
+  default = "latest"  
+}
+
 resource "helm_release" "video_uploader" {
   name             = "video-uploader"
   namespace        = "video-uploader"
@@ -18,8 +23,4 @@ resource "helm_release" "video_uploader" {
     name  = "image.tag"
     value = var.image_tag
   } 
-}
-variable "image_tag" {
-  type    = string
-  default = "latest"  
 }
