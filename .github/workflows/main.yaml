@@ -5,6 +5,9 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+    paths-ignore:
+        - 'README.md'
+        - 'docker-compose.yml'
 
 env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
