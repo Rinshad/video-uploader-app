@@ -16,6 +16,10 @@ resource "helm_release" "video_uploader" {
 
   set {
     name  = "image.tag"
-    value = "latest"
+    value = var.image_tag
   } 
+}
+variable "image_tag" {
+  type    = string
+  default = "latest"  
 }

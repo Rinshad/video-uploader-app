@@ -109,15 +109,16 @@ jobs:
         working-directory: ./kind_cluster
           
 
-      - name: Application deployment
+      - name: Application deployment using terraform
         run: |
           terraform init
-          terraform apply -auto-approve
+          terraform apply -auto-approve -var="image_tag=${{ steps.git_info.outputs.sha_short }}"
+        working-directory: ./kind_cluster
 
       - name: Run Smoke Tests
         run: |
           sleep 30
-          kubectl get pods,services,ing -n video-uploader
+          kubectl get pods,services -n video-uploader
           kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl -m 10 http://nginx.video-uploader.svc.cluster.local:8000/health
 
 
