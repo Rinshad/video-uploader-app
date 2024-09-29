@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline Video uploader app
 
 on:
   push:
@@ -57,21 +57,25 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-    
-      - name: Install Trivy
-        run: |
-          sudo apt-get update && sudo apt-get install -y wget
-          wget https://github.com/aquasecurity/trivy/releases/download/v0.32.1/trivy_0.32.1_Linux-64bit.deb
-          sudo dpkg -i trivy_0.32.1_Linux-64bit.deb
 
+
+      - name: Extract Git commit info
+        id: git_info
+        run: |
+          echo "Commit SHA: ${GITHUB_SHA}"
+          echo "Short SHA: ${GITHUB_SHA::7}"
+          echo "Branch: ${GITHUB_REF##*/}"
+          echo "::set-output name=sha_short::${GITHUB_SHA::7}"
+          echo "::set-output name=branch::${GITHUB_REF##*/}"
+  
       - name: Build and push SPA image
-        run: docker buildx build --platform linux/amd64 --file Dockerfile.react --tag ${{ secrets.DOCKERHUB_USERNAME }}/spa:latest --push .
-             
+        run: docker buildx build --platform linux/amd64 --file Dockerfile.react --tag ${{ secrets.DOCKERHUB_USERNAME }}/spa:${{ steps.git_info.outputs.sha_short }} --push .
+               
       - name: Build and push API image
-        run: docker buildx build --platform linux/amd64 --file Dockerfile.rails --tag ${{ secrets.DOCKERHUB_USERNAME }}/api:latest --push .
-             
+        run: docker buildx build --platform linux/amd64 --file Dockerfile.rails --tag ${{ secrets.DOCKERHUB_USERNAME }}/api:${{ steps.git_info.outputs.sha_short }} --push .
+               
       - name: Build and push NGINX image
-        run: docker buildx build --platform linux/amd64 --file Dockerfile.nginx --tag ${{ secrets.DOCKERHUB_USERNAME }}/nginx:latest --push .
+        run: docker buildx build --platform linux/amd64 --file Dockerfile.nginx --tag ${{ secrets.DOCKERHUB_USERNAME }}/nginx:${{ steps.git_info.outputs.sha_short }} --push .
           
   deploy:
     runs-on: ubuntu-latest

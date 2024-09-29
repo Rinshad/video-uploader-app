@@ -13,9 +13,4 @@ resource "helm_release" "video_uploader" {
   values = [
     file("${path.module}/Helm_Chart/values.yaml")
   ]
-
-  set {
-    name  = "image.tag"
-    value = "latest"
-  } 
 }
