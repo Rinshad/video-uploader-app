@@ -89,14 +89,6 @@ SonarQube Cloud is integrated into the GitHub pipeline for application code scan
 
 [SonarCloud Project Link](#)
 
-  
-
-## Container Image Scanning
-
-Trivy, a comprehensive security scanner for container images, is integrated into the GitHub pipeline to identify vulnerabilities, misconfigurations, and other security issues in Docker images.
-
-  
-
 ## Development and Testing
 
   
