@@ -1,60 +1,137 @@
-## Application pipeline
-The Github workflow pipeline contains 2 job, more details are given below.
+# Video Uploader Application CI/CD
 
- 1. build-and-push => This job will build, scan and push images
- 2. provision-kind-cluster => This job will provision a kind cluster and deploy the video-uploader application to the same cluster using Helm chart
+  
 
-## Application deployment
-To deploy a new version of the application, make the changes in the code and push to repository, this will trigger the pipeline and the pipeline will perform the application containirization and deployment to the Kind cluster.
+## Introduction
 
-## Improvement
-Application deployment can be made to perisistent with the help of statefulset deployment. Statefulset helps application to use the same storage in the event of a pod restart as well a grace shutdown of the application (or pods). 
+This repository contains the continuous integration and deployment pipeline for the Video Uploader application using GitHub Actions.
 
-The terminationGracePeriodSeconds in the Stateful give a session time to users to complete the file upload.
+  
 
-```shell
+## Table of Contents
+
+- [CI/CD Pipeline](#cicd-pipeline)
+
+- [New Version Deployment](#new-version-deployment)
+
+- [Improvements](#improvements)
+
+- [Kind Cluster Deployment](#kind-cluster-deployment)
+
+- [Code Scanning](#code-scanning)
+
+- [Container Image Scanning](#container-image-scanning)
+
+- [Development and Testing](#development-and-testing)
+
+- [Prerequisites](#prerequisites)
+
+- [Installation](#installation)
+
+- [Usage](#usage)
+
+  
+
+## CI/CD Pipeline
+
+The GitHub workflow pipeline consists of four main jobs:
+
+  
+
+1.  **lint-and-test**: Performs lint testing and caches dependencies.
+
+2.  **build-scan-push**: Conducts code scanning using SonarQube Cloud, containerizes the application using Docker Buildx, and pushes to the DockerHub repository.
+
+3.  **deploy**: Provisions a Kind cluster (1 control plane node and 2 worker nodes) using Terraform and deploys the application using Helm charts.
+
+4.  **notify**: Sends deployment status notifications (Failed or Successful) to the configured Slack channel.
+
+  
+
+## New Version Deployment
+
+To deploy a new version of the application:
+
+1. Clone the repository
+
+2. Make necessary changes to the code
+
+3. Push changes to the master branch
+
+The pipeline will automatically handle testing, building, and deployment of the new version.
+
+  
+
+## Improvements
+
+- Application deployment can be made persistent using StatefulSet deployment.
+
+- StatefulSet ensures the application uses the same storage in the event of a pod restart and allows for graceful shutdown.
+
+- Example of graceful shutdown configuration:
+
+```yaml
+
 spec:
-  terminationGracePeriodSeconds: 30
-  containers:
-  - name: api
+terminationGracePeriodSeconds: 30
+containers:
+- name: api
 ```
+## Kind Cluster Deployment
 
-## Kind cluster deployment
-Terraform used to provision the the kind cluster, 1 controlplane node and 2 worker node. Also, Nginx Ingress port maping also done as part othe cluster provisioning.
+Terraform is used to provision the Kind cluster with 1 control plane node and 2 worker nodes.
 
-## Code scanning using sonarqube
-Sonarqube cloud scanning is used for application code scanning and it is integrated to the Github pipeline.
+Nginx Ingress port mapping is configured as part of the cluster provisioning.
+ 
 
-## Container Image scanning using Trivy.
-Trivy is a comprehensive security scanner for container images, It helps in identifying vulnerabilities, misconfigurations, and other security issues in docker images. Trivy scan tool also integrated with the Github pipeline.
+## Code Scanning
+SonarQube Cloud is integrated into the GitHub pipeline for application code scanning.
+
+[SonarCloud Project Link](#)
+
+  
+
+## Container Image Scanning
+
+Trivy, a comprehensive security scanner for container images, is integrated into the GitHub pipeline to identify vulnerabilities, misconfigurations, and other security issues in Docker images.
+
+  
 
 ## Development and Testing
+
+  
+
 ### Prerequisites
 
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
+- Docker
+- Docker Compose 
 
 ### Installation
-If you're using an M1/2 Mac OS, please consider creating this environment variable:
-`CPU_ARCH=arm64`
 
+For M1/M2 Mac OS users, set the following environment variable:
+
+  
+
+```shell
+export  CPU_ARCH=arm64
+```
+
+then  run:
 ```shell
 docker compose build
 docker compose run api rake db:setup
 docker compose run api rake db:migrate
 ```
-
-## Usage
-### Tests
-
+Running Tests
 ```shell
-docker compose run api rake db:migrate RAILS_ENV=test
-docker compose run api rspec
+docker  compose  run  api  rake  db:migrate  RAILS_ENV=test
+docker  compose  run  api  rspec
 ```
-
-### Run
-
+Running  the  Application
 ```shell
 docker compose up
-open http://localhost:8000
+```
+Open the application in your browser:
+```shell
+open  http://localhost:8000
 ```
