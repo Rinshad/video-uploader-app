@@ -139,13 +139,13 @@ jobs:
           kubectl get pods,services -n video-uploader
           kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl -m 10 http://nginx.video-uploader.svc.cluster.local:8000/health
            
-        # Check the exit status
-         # if [ $? -eq 0 ]; then
-         #   echo "Smoke test passed!"
-         # else
-         #   echo "Smoke test failed!"
-         #   exit 1
-         # fi
+          ##Check the exit status
+          #if [ $? -eq 0 ]; then
+          #  echo "Smoke test passed!"
+          #else
+          #  echo "Smoke test failed!"
+          #  exit 1
+          #fi
 
   notify:
      runs-on: ubuntu-latest
