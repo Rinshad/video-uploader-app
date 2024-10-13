@@ -146,7 +146,8 @@ jobs:
         run: |
           kubectl get pods,services,ing -n video-uploader
           echo "127.0.0.1 example.org" | sudo tee -a /etc/hosts
-          kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl -m 10 http://example.org/health
+          #kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl -m 10 http://example.org/health
+          curl -m 10 http://example.org/health
 
   notify:
      runs-on: ubuntu-latest
