@@ -114,10 +114,21 @@ jobs:
           terraform init
           terraform apply -auto-approve -var="image_tag=${{ steps.git_info.outputs.sha_short }}"
         working-directory: ./app-deploy
+      
+      - name: Wait for application to be ready
+        run: |
+          echo "Waiting for the application to be ready..."
+          for i in {1..30}; do
+            if kubectl get pods -n video-uploader| grep -q 'Running'; then
+              echo "Application is running!"
+              break
+            fi
+            echo "Waiting for 10 seconds..."
+            sleep 10
+          done
 
       - name: Run Smoke Tests
         run: |
-          sleep 30
           kubectl get pods,services -n video-uploader
           kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl -m 10 http://nginx.video-uploader.svc.cluster.local:8000/health
 
