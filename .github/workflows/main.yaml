@@ -111,7 +111,8 @@ jobs:
       - name: Ingress installation
         run: |
           kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-          
+          sleep 30
+
       - name: Application deployment using terraform
         run: |
           terraform init
