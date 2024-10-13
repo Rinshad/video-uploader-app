@@ -118,7 +118,7 @@ jobs:
       - name: Wait for all pods to be ready
         run: |
           echo "Waiting for all application pods to be ready..."
-          sleep 20
+          sleep 30
           for i in {1..30}; do
             total_pods=$(kubectl get pods -n video-uploader --no-headers | wc -l)
             running_pods=$(kubectl get pods -n video-uploader --no-headers | grep -c 'Running')

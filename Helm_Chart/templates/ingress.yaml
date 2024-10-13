@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   rules:
-  - host: video-app.local
+  - host: {{ .Values.host }}
     http:
       paths:
       - path: /
