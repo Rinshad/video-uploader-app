@@ -111,7 +111,18 @@ jobs:
       - name: Ingress installation
         run: |
           kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-          sleep 30
+      
+      - name: Wait for ingress to be ready
+        run: |
+          echo "Waiting for the application to be ready..."
+          for i in {1..30}; do
+            if kubectl get pods -n ingress-nginx | grep -q 'Running'; then
+              echo "Application is running!"
+              break
+            fi
+            echo "Waiting for 10 seconds..."
+            sleep 10
+          done
 
       - name: Application deployment using terraform
         run: |
