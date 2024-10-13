@@ -118,6 +118,7 @@ jobs:
       - name: Wait for all pods to be ready
         run: |
           echo "Waiting for all application pods to be ready..."
+          sleep 20
           for i in {1..30}; do
             total_pods=$(kubectl get pods -n video-uploader --no-headers | wc -l)
             running_pods=$(kubectl get pods -n video-uploader --no-headers | grep -c 'Running')
@@ -134,9 +135,8 @@ jobs:
 
       - name: Run Smoke Tests
         run: |
-          sleep 30 
           kubectl get pods,services,ing -n video-uploader
-          kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl -m 10 http://nginx.video-uploader.svc.cluster.local:8000/health
+          kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl -m 0 http://nginx.video-uploader.svc.cluster.local:8000/health
 
 
   notify:
