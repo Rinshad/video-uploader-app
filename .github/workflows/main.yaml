@@ -116,6 +116,17 @@ jobs:
             sleep 40
           done
 
+          
+            - name: Update values.yaml with secrets
+          run: |
+            # Use sed to insert secrets into the existing values.yaml
+            sed -i "s|^\( *DB_PASS: \).*|\1${{ secrets.DB_PASSWORD }}|" values.yaml
+            sed -i "s|^\( *DB_USER: \).*|\1${{ secrets.DB_USER }}|" values.yaml
+            sed -i "s|^\( *SECRET_KEY_BASE: \).*|\1${{ secrets.SECRET_KEY_BASE }}|" values.yaml
+ 
+       
+
+            
       - name: Application deployment using terraform
         run: |
           terraform init
