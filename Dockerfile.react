@@ -1,3 +1,4 @@
+#Official node base image
 FROM node:18
 
 WORKDIR /app
@@ -5,7 +6,6 @@ COPY spa .
 
 RUN npm install
 
-COPY spa .
 ENV PORT=4000
 EXPOSE $PORT
 
