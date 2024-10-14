@@ -21,53 +21,61 @@ jobs:
         with:
           node-version: '14'
 
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+
       - name: Install dependencies
         run: cd spa && npm ci
 
       - name: Run linter
         run: cd spa && npm run lint
 
-  build-scan-push:
-    runs-on: ubuntu-latest
-    needs: lint-and-test
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-    
-      - name: SonarQube Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-
-      - name: Extract Git commit info
-        id: git_info
-        run: |
-          echo "Commit SHA: ${GITHUB_SHA}"
-          echo "Short SHA: ${GITHUB_SHA::7}"
-          echo "Branch: ${GITHUB_REF##*/}"
-          echo "::set-output name=sha_short::${GITHUB_SHA::7}"
-          echo "::set-output name=branch::${GITHUB_REF##*/}"
-  
-      - name: Build and push SPA image
-        run: docker buildx build --platform linux/amd64 --file Dockerfile.react --tag ${{ secrets.DOCKERHUB_USERNAME }}/spa:${{ steps.git_info.outputs.sha_short }} --push .
-               
-      - name: Build and push API image
-        run: docker buildx build --platform linux/amd64 --file Dockerfile.rails --tag ${{ secrets.DOCKERHUB_USERNAME }}/api:${{ steps.git_info.outputs.sha_short }} --push .
-               
-      - name: Build and push NGINX image
-        run: docker buildx build --platform linux/amd64 --file Dockerfile.nginx --tag ${{ secrets.DOCKERHUB_USERNAME }}/nginx:${{ steps.git_info.outputs.sha_short }} --push .
+  #build-scan-push:
+  #  runs-on: ubuntu-latest
+  #  needs: lint-and-test
+  #  steps:
+  #    - uses: actions/checkout@v3
+#
+  #    - name: Set up QEMU
+  #      uses: docker/setup-qemu-action@v2
+#
+  #    - name: Set up Docker Buildx
+  #      uses: docker/setup-buildx-action@v2
+  #  
+  #    - name: SonarQube Scan
+  #      uses: SonarSource/sonarcloud-github-action@master
+  #      env:
+  #        SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+#
+  #    - name: Login to DockerHub
+  #      uses: docker/login-action@v2
+  #      with:
+  #        username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #        password: ${{ secrets.DOCKERHUB_TOKEN }}
+#
+#
+  #    - name: Extract Git commit info
+  #      id: git_info
+  #      run: |
+  #        echo "Commit SHA: ${GITHUB_SHA}"
+  #        echo "Short SHA: ${GITHUB_SHA::7}"
+  #        echo "Branch: ${GITHUB_REF##*/}"
+  #        echo "::set-output name=sha_short::${GITHUB_SHA::7}"
+  #        echo "::set-output name=branch::${GITHUB_REF##*/}"
+  #
+  #    - name: Build and push SPA image
+  #      run: docker buildx build --platform linux/amd64 --file Dockerfile.react --tag ${{ secrets.DOCKERHUB_USERNAME }}/spa:${{ steps.git_info.outputs.sha_short }} --push .
+  #             
+  #    - name: Build and push API image
+  #      run: docker buildx build --platform linux/amd64 --file Dockerfile.rails --tag ${{ secrets.DOCKERHUB_USERNAME }}/api:${{ steps.git_info.outputs.sha_short }} --push .
+  #             
+  #    - name: Build and push NGINX image
+  #      run: docker buildx build --platform linux/amd64 --file Dockerfile.nginx --tag ${{ secrets.DOCKERHUB_USERNAME }}/nginx:${{ steps.git_info.outputs.sha_short }} --push .
           
   deploy:
     runs-on: ubuntu-latest
@@ -113,20 +121,14 @@ jobs:
               break
             fi
             echo "Waiting for 30 seconds..."
-            sleep 40
+            sleep 30
           done
-
-          
-            - name: Update values.yaml with secrets
-          run: |
-            # Use sed to insert secrets into the existing values.yaml
-            sed -i "s|^\( *DB_PASS: \).*|\1${{ secrets.DB_PASSWORD }}|" values.yaml
-            sed -i "s|^\( *DB_USER: \).*|\1${{ secrets.DB_USER }}|" values.yaml
-            sed -i "s|^\( *SECRET_KEY_BASE: \).*|\1${{ secrets.SECRET_KEY_BASE }}|" values.yaml
- 
-       
-
-            
+      - name: Update values.yaml with secrets
+        run: |
+          sed -i "s|^\( *DB_PASS: \).*|\1${{ secrets.DB_PASSWORD }}|" values.yaml
+          sed -i "s|^\( *DB_USER: \).*|\1${{ secrets.DB_USER }}|" values.yaml
+          sed -i "s|^\( *SECRET_KEY_BASE: \).*|\1${{ secrets.SECRET_KEY_BASE }}|" values.yaml
+  
       - name: Application deployment using terraform
         run: |
           terraform init
@@ -150,16 +152,11 @@ jobs:
             sleep 10
           done
       
-
-     # - name: Run Smoke Tests
-     #   run: |
-     #     kubectl get pods,services,ing -n video-uploader
-     #     kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl -m 0 http://nginx.video-uploader.svc.cluster.local:8000/health
-
       - name: Run Smoke Tests
         run: |
           kubectl get pods,services,ing -n video-uploader
           echo "127.0.0.1 example.org" | sudo tee -a /etc/hosts
+          #kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl -m 10 http://example.org/health
           curl -m 10 http://example.org/health
 
   notify:
