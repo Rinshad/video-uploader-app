@@ -87,7 +87,7 @@ Nginx Ingress port mapping is configured as part of the cluster provisioning.
 ## Code Scanning
 SonarQube Cloud is integrated into the GitHub pipeline for application code scanning.
 
-[SonarCloud Project Link](#)
+[SonarCloud Project Link](https://sonarcloud.io/organizations/video-uploader/projects)
 
   
 
