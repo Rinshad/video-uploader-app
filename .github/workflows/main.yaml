@@ -125,9 +125,9 @@ jobs:
           done
       - name: Update values.yaml with secrets
         run: |
-          sed -i "s|^\( *DB_PASS: \).*|\1${{ secrets.DB_PASSWORD }}|" app-deploy/values.yaml
-          sed -i "s|^\( *DB_USER: \).*|\1${{ secrets.DB_USER }}|" app-deploy/values.yaml
-          sed -i "s|^\( *SECRET_KEY_BASE: \).*|\1${{ secrets.SECRET_KEY_BASE }}|" app-deploy/values.yaml
+          sed -i "s|^\( *DB_PASS: \).*|\1${{ secrets.DB_PASSWORD }}|" Helm_Chart/values.yaml
+          sed -i "s|^\( *DB_USER: \).*|\1${{ secrets.DB_USER }}|" Helm_Chart/values.yaml
+          sed -i "s|^\( *SECRET_KEY_BASE: \).*|\1${{ secrets.SECRET_KEY_BASE }}|" Helm_Chart/values.yaml
   
       - name: Application deployment using terraform
         run: |
